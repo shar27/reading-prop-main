@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import emailjs from '@emailjs/browser';
 import styled from "styled-components";
 import ReCAPTCHA from 'react-google-recaptcha';
@@ -7,6 +7,13 @@ export default function Contact() {
   const [message, setMessage] = useState('');
   const [recaptchaToken, setRecaptchaToken] = useState(null);
   const form = useRef();
+
+  useEffect(() => {
+    // Set the current URL in the hidden input field when component mounts
+    if (form.current) {
+      form.current.current_url.value = window.location.href;
+    }
+  }, []);
 
   const onReCAPTCHAChange = (token) => {
     setRecaptchaToken(token);
@@ -24,6 +31,7 @@ export default function Contact() {
       .then((result) => {
           console.log(result.text);
           setMessage('Your message has been received');
+          
       }, (error) => {
         setMessage('Error sending message, please email hello@swiftukproperties.co.uk');
           console.log(error.text);
@@ -43,11 +51,34 @@ export default function Contact() {
               <Form onSubmit={sendEmail} ref={form} id="contactForm">
                 <label className="font13">First name:</label>
                 <input required type="text" name="fname" className="font20 extraBold" />
+                <label className="font13">Number:</label>
+                <input required type="tel" name="user_number" className="font20 extraBold" />
                 <label className="font13">Email:</label>
                 <input required type="email" name="user_email" className="font20 extraBold" />
+                <label className="font13">Postcode:</label>
+                <input required type="text" name="user_postcode" className="font20 extraBold" />
+
+                <label className="font13">Enquiry Type:</label>
+                <select required name="user_enquiry" className="font20 extraBold">
+                  <option value="handyman">Handyman</option>
+                  <option value="cleaning">Cleaning</option>
+                  <option value="clearance">Clearance</option>
+                  <option value="plumbing">Plumbing</option>
+                  <option value="electrician">Electrician</option>
+                </select>
+                <br/>
+                <label className="font13">Have you sent us photos on WhatsApp or Email?</label>
+                <select required name="user_photos" className="font20 extraBold">
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+                <br/>
                 <label className="font13">Subject:</label>
                 <input required type="text" name="subject" className="font20 extraBold" />
+                <label className="font13">Description:</label>
                 <textarea rows="4" cols="50" type="text" id="message" name="message" className="font20 extraBold" />
+
+                <input type="hidden" name="current_url" />
 
                 <ReCAPTCHA
                   sitekey="6LfV9nkqAAAAAKJA-KJdoNsvQDXNTbBDIxkDXKbp"
@@ -65,6 +96,9 @@ export default function Contact() {
     </Wrapper>
   );
 }
+
+// Styled components...
+
 
 const Wrapper = styled.section`
   width: 100%;
